@@ -1,85 +1,54 @@
 <div align="center">
 
-# 🕹️ Axiom99 // NexusWeb Console
-### *The Next-Generation Open-Source Browser-Native 3D Game Engine & Console*
+# 👑 Axiom99 // Autonomous AI Agent Swarm Command Center
+### *The Next-Generation Multi-Agent Swarm Intelligence, Studio & Operations Platform*
 
-[![Live Demo](https://img.shields.io/badge/LIVE_DEMO-PLAY_NOW-00ffcc?style=for-the-badge&logo=googlechrome&logoColor=black)](https://ghouseahmed226-debug.github.io/Axiom99/)
+[![Live Demo](https://img.shields.io/badge/LIVE_SWARM-COMMAND_NOW-00ffcc?style=for-the-badge&logo=googlechrome&logoColor=black)](https://axiom99.vercel.app)
 [![CI](https://github.com/ghouseahmed226-debug/Axiom99/actions/workflows/ci.yml/badge.svg)](https://github.com/ghouseahmed226-debug/Axiom99/actions/workflows/ci.yml)
-[![Pages Deploy](https://github.com/ghouseahmed226-debug/Axiom99/actions/workflows/pages.yml/badge.svg)](https://github.com/ghouseahmed226-debug/Axiom99/actions/workflows/pages.yml)
-[![Three.js](https://img.shields.io/badge/Three.js-0.165-0080ff?style=for-the-badge&logo=three.js)](https://threejs.org/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-white?style=for-the-badge&logo=vercel)](https://axiom99.vercel.app)
 [![React 18](https://img.shields.io/badge/React-18-61dafb?style=for-the-badge&logo=react)](https://reactjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 <br/>
 
-## 🌐 **[👉 CLICK HERE TO PLAY LIVE DEMO 👈](https://ghouseahmed226-debug.github.io/Axiom99/)**
-### **Live URL**: `https://ghouseahmed226-debug.github.io/Axiom99/`
+## 🌐 **[👉 CLICK HERE TO OPEN LIVE AI SWARM COMMAND 👈](https://axiom99.vercel.app)**
+### **Live URL**: `https://axiom99.vercel.app`
 
 <p align="center">
-  <b>Play instantly in any modern browser. Zero downloads. Sub-16ms latency. AI-driven gameplay.</b>
+  <b>Orchestrate 99 specialized autonomous AI agents across 9 engineering divisions. Real-time telemetry. Interactive reasoning loops. Multi-agent mission pipelines.</b>
 </p>
 
 </div>
 
 ---
 
-## 🎮 Playable 3D Game Cartridges
+## ⚡ Key Platform Capabilities
 
-| Cartridge | Tech & Mechanics | Controls |
-|---|---|---|
-| 🏎️ **CyberRunner 2099** | Procedural 3-lane neon highway runner, jump physics, collision detection, glowing orbs, score multiplier | `[A/D]` Switch Lanes<br>`[W / Space]` Jump |
-| 🛸 **NeonArena 3D** | Top-down cyberpunk arena shooter, enemy drone swarm AI pathfinding, laser physics, particle explosions | `[WASD]` Move Ship<br>`[Mouse + Click]` Aim & Fire |
-| 🧱 **VoxelCraft 3D** | 3D voxel sandbox builder, raycasted block placement & destruction, 6-color cyber palette selector | `[Click]` Place Block<br>`[Shift + Click]` Mine Block |
-
----
-
-## 🏛️ System Architecture
-
-```
-                                  +---------------------------------------+
-                                  |     NexusWeb Browser Client / PWA     |
-                                  |   (Three.js + R3F + Rapier WASM)      |
-                                  +-------------------+-------------------+
-                                                      |
-                         +----------------------------+----------------------------+
-                         |                                                         |
-                         v                                                         v
-        +----------------------------------+                     +----------------------------------+
-        |   Firebase Realtime Data Hose    |                     |   Supabase Persistent Layer      |
-        |  - Sub-16ms Delta Position Sync  |                     |  - PostgreSQL 16 + RLS           |
-        |  - Bit-packed Input Frames       |                     |  - pgvector (LLM Memory)         |
-        |  - Ephemeral Session State       |                     |  - Profiles, Wallets, Catalog    |
-        +----------------------------------+                     +----------------------------------+
-                         ^                                                         ^
-                         |                                                         |
-                         +----------------------------+----------------------------+
-                                                      |
-                                                      v
-                                  +---------------------------------------+
-                                  |       Python AI & Analytics API       |
-                                  |   (FastAPI + XGBoost + IsoForest)     |
-                                  |  - Skill-Based Matchmaking (SBMM)     |
-                                  |  - Telemetry Anti-Cheat Anomaly Engine|
-                                  |  - LLM Quest & NPC Generator          |
-                                  +---------------------------------------+
-```
+| Feature | Description |
+|---|---|
+| 👑 **Swarm Command Center** | Real-time telemetry dashboard monitoring 99 active agent nodes, division health, latency metrics, and live operation streams. |
+| 💬 **Multi-Agent Chat Studio** | Interactive playground to converse with individual operatives or dispatch broadcast directives with reasoning step accordions & tool call steps. |
+| 👥 **99-Agent Swarm Roster** | Comprehensive directory categorized across 9 specialized task forces with domain directives, temperature settings, and capability tags. |
+| 🔄 **Autonomous Workflows** | Mission control pipeline orchestrating automated multi-agent handoffs with validation checkpoints (Security Audits, Task Decomposition, Edge Optimization). |
+| 🛠️ **Agent Architecture Studio** | Visual builder to create, customize directives, bind LLM models (Gemini, Claude, GPT, Ollama), and deploy custom agents to the swarm. |
+| ⚙️ **Config & API Keys** | Seamless integration with Google Gemini, OpenAI, Anthropic, and local Ollama / vLLM endpoints. |
 
 ---
 
-## 🤖 The 99-Agent Division Roster
+## 🤖 The 99-Agent Division Matrix
 
 | Division | Squad Name | Mission & Key Directives | Core Agents |
 |---|---|---|---|
-| **Div 1** | **Core Engine & Graphics** | 60FPS+ WebGPU/WebGL2 rendering, LOD, draw call batching | `A1` WebGPU Architect, `A4` BufferGeometry Optimizer, `A9` WASM Jolt Physics |
-| **Div 2** | **React & Extension** | Cyberpunk HUD, PWA manifest, Chrome MV3 service worker | `A12` PWA Architect, `A15` Service Worker Dev, `A19` R3F Bridge |
-| **Div 3** | **Firebase Real-Time** | Sub-16ms multiplayer state sync, bit-packed inputs | `A23` WebSockets Lead, `A27` Client-Prediction, `A31` Lag Compensation |
-| **Div 4** | **Supabase Metagame** | PostgreSQL DDL, strict RLS, pgvector LLM memory | `A34` Schema Designer, `A38` RLS Enforcer, `A42` Supabase Auth |
-| **Div 5** | **Data & XGBoost** | Predictive ELO matchmaking, Isolation Forest anti-cheat | `A45` SBMM Modeler, `A49` Anti-Cheat Lead, `A54` Data Pipeline |
-| **Div 6** | **LLM & Gameplay AI** | Procedural quests, dynamic NPC cognitive loops | `A56` Prompt Pipeline, `A61` NPC Loop Engineer, `A65` Toxicity Filter |
-| **Div 7** | **Security Squad** | Memory injection prevention, input sanitization, rate limits | `A67` WASM Obfuscator, `A72` Memory Shield, `A77` Rate-Limiter |
-| **Div 8** | **DevOps & CI/CD** | Automated GitHub Actions, Cloudflare edge, Docker containerization | `A78` Git Strategy, `A83` Actions Automator, `A88` Edge Manager |
-| **Div 9** | **Open-Source & Virality** | Community growth, interactive documentation, issue triage | `A89` README Architect, `A94` Contributor Lead, `A99` Discord Bot |
+| **Div 1** | **Core Engine & Systems** | High-performance systems architecture, compiler optimizations, kernel compute | `A1` WebGPU Architect, `A4` BufferGeometry Optimizer, `A9` WASM Physics Lead |
+| **Div 2** | **Interface & UX Systems** | Cyberpunk HUD engineering, reactive design, micro-frontend state bridges | `A12` PWA Architect, `A15` Service Worker Dev, `A19` Reactive Bridge |
+| **Div 3** | **Real-Time Data Streams** | Sub-10ms binary delta synchronization, backpressure handling, heartbeat loops | `A23` WebSocket Stream Lead, `A27` Client Predictor, `A31` Lag Compensator |
+| **Div 4** | **Knowledge & Persistence** | PostgreSQL DDL, strict RLS, pgvector HNSW semantic embeddings & memory recall | `A34` pgvector Architect, `A38` RLS Enforcer, `A42` Auth Lead |
+| **Div 5** | **Intelligence & Predictive ML** | XGBoost predictive modeling, Isolation Forest anomaly heuristics, telemetry scoring | `A45` XGBoost Modeler, `A49` Anomaly Shield Lead, `A54` Data Pipeline |
+| **Div 6** | **LLM & Autonomous Reasoning** | Chain-of-thought prompt orchestration, dynamic task decomposition, ReAct loops | `A56` Prompt Synthesizer, `A61` Agent Loop Engineer, `A65` Toxicity Guard |
+| **Div 7** | **Security & Guardrails** | Memory boundary shields, prompt injection defense, cryptographic token checks | `A67` Memory Shield Core, `A72` Sandbox Lead, `A77` Rate-Limiter |
+| **Div 8** | **DevOps, Edge & Cloud** | Global edge worker routing, automated CI/CD deployment matrices, multi-region CDN | `A78` Edge Matrix Lead, `A83` Actions Automator, `A88` Edge Manager |
+| **Div 9** | **Integrations & Open Source** | API gateway connectors, developer documentation bots, ecosystem integrations | `A89` Documentation Bot, `A94` Contributor Lead, `A99` Swarm Orchestrator |
 
 ---
 
@@ -93,11 +62,11 @@ cd Axiom99
 # 2. Run instant setup
 ./setup.sh
 
-# 3. Start Web Console (PWA)
+# 3. Start Swarm Web Command Center
 cd apps/web && npm run dev
 # -> http://localhost:3000
 
-# 4. Start Python AI Backend
+# 4. Start Python AI Backend (Optional)
 cd apps/api && uvicorn src.main:app --reload --port 8000
 # -> http://localhost:8000/docs
 ```
@@ -106,15 +75,8 @@ cd apps/api && uvicorn src.main:app --reload --port 8000
 
 ## ☁️ Deployment
 
-### 1. GitHub Pages (Automated)
-This repository includes an automatic GitHub Actions deployment workflow (`.github/workflows/pages.yml`).  
-In your repository:
-1. Go to **Settings** → **Pages**
-2. Under **Build and deployment** → **Source**, select **GitHub Actions**.
-3. Every push to `main` automatically updates your live game console at:  
-   👉 **`https://ghouseahmed226-debug.github.io/Axiom99/`**
-
-### 2. Vercel / Netlify
+### Vercel (Production)
+- **Live URL**: `https://axiom99.vercel.app`
 - **Root Directory**: `apps/web`
 - **Build Command**: `npm run build`
 - **Output Directory**: `dist`
