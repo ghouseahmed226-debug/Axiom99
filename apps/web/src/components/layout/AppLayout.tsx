@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAgentStore } from '../../store/agentStore'
-import { AGENT_DIVISIONS } from '../../data/agentsRoster'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -9,7 +8,7 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation()
-  const { agents, logs, totalOpsCount } = useAgentStore()
+  const { agents, totalOpsCount } = useAgentStore()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [broadcastOpen, setBroadcastOpen] = useState(false)
   const [broadcastText, setBroadcastText] = useState('')
@@ -19,8 +18,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const navItems = [
     { path: '/', label: 'Swarm Command', icon: '⚡' },
     { path: '/chat', label: 'Agent Chat', icon: '💬' },
-    { path: '/roster', label: '99-Agent Roster', icon: '👥' },
+    { path: '/war-room', label: 'War Room Debate', icon: '⚔️' },
+    { path: '/neural-mesh', label: '3D Neural Mesh', icon: '🌐' },
+    { path: '/builder', label: 'Flow Builder', icon: '🧩' },
     { path: '/workflows', label: 'Workflows', icon: '🔄' },
+    { path: '/roster', label: '99-Agent Roster', icon: '👥' },
+    { path: '/knowledge', label: 'Knowledge RAG', icon: '🧠' },
     { path: '/studio', label: 'Agent Studio', icon: '🛠️' },
     { path: '/settings', label: 'API & Config', icon: '⚙️' },
   ]
@@ -55,7 +58,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   AXIOM 99
                 </span>
                 <span className="text-[10px] tracking-widest text-slate-400 font-mono">
-                  AI SWARM COMMAND
+                  SWARM OPERATING SYSTEM
                 </span>
               </div>
             )}
@@ -71,28 +74,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         {/* SWARM STATUS BADGE */}
         {sidebarOpen ? (
-          <div className="mx-3 mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3">
+          <div className="mx-3 mt-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="relative flex h-2.5 w-2.5">
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span className="text-xs font-semibold text-emerald-400 tracking-wide uppercase font-mono">
-                  Swarm Online
+                <span className="text-[11px] font-semibold text-emerald-400 tracking-wide uppercase font-mono">
+                  Swarm Mesh Online
                 </span>
               </div>
               <span className="text-xs font-mono font-bold text-slate-300">
                 {activeAgentsCount}/{agents.length}
               </span>
             </div>
-            <div className="mt-2 text-[11px] text-slate-400 flex justify-between font-mono">
-              <span>Ops: {totalOpsCount.toLocaleString()}</span>
-              <span>Divisions: 9</span>
-            </div>
           </div>
         ) : (
-          <div className="mt-4 flex justify-center">
+          <div className="mt-3 flex justify-center">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
@@ -101,21 +100,21 @@ export default function AppLayout({ children }: AppLayoutProps) {
         )}
 
         {/* NAVIGATION LINKS */}
-        <nav className="mt-4 flex-1 space-y-1.5 px-3">
+        <nav className="mt-3 flex-1 space-y-1 px-3 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium transition-all ${
                   isActive
                     ? 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/10'
                     : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
                 }`}
                 title={item.label}
               >
-                <span className="text-lg">{item.icon}</span>
+                <span className="text-base">{item.icon}</span>
                 {sidebarOpen && <span>{item.label}</span>}
               </Link>
             )
@@ -126,20 +125,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className="p-3 border-t border-slate-800/80">
           <button
             onClick={() => setBroadcastOpen(true)}
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 px-3 py-2.5 text-xs font-semibold text-white shadow-lg shadow-cyan-600/25 hover:from-cyan-500 hover:to-indigo-500 transition"
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-lg shadow-cyan-600/25 hover:from-cyan-500 hover:to-indigo-500 transition"
           >
             <span>📢</span>
             {sidebarOpen && <span>Broadcast Directive</span>}
           </button>
         </div>
-
-        {/* FOOTER STATS */}
-        {sidebarOpen && (
-          <div className="px-4 py-3 bg-[#080b12] text-[11px] text-slate-500 font-mono flex items-center justify-between border-t border-slate-900">
-            <span>Axiom v2.4</span>
-            <span className="text-emerald-400">Lat: 48ms</span>
-          </div>
-        )}
       </aside>
 
       {/* MAIN CONTENT AREA */}
@@ -151,18 +142,21 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <span className="text-cyan-400">❖</span>
               {location.pathname === '/' && 'Swarm Operations Command'}
               {location.pathname === '/chat' && 'Multi-Agent Interactive Playground'}
-              {location.pathname === '/roster' && '99-Agent Swarm Registry & Divisions'}
+              {location.pathname === '/war-room' && 'Autonomous Multi-Agent War Room'}
+              {location.pathname === '/neural-mesh' && '3D Swarm Neural Constellation'}
+              {location.pathname === '/builder' && 'Visual Node Flowchart Builder'}
               {location.pathname === '/workflows' && 'Automated Multi-Agent Pipelines'}
+              {location.pathname === '/roster' && '99-Agent Swarm Registry & Divisions'}
+              {location.pathname === '/knowledge' && 'Agent Memory & Document RAG'}
               {location.pathname === '/studio' && 'Agent Creator & Architecture Studio'}
               {location.pathname === '/settings' && 'System Configuration & Model Settings'}
             </h1>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* QUICK TELEMETRY CHIP */}
             <div className="hidden md:flex items-center gap-2 rounded-lg bg-slate-800/60 border border-slate-700/50 px-3 py-1.5 text-xs font-mono text-slate-300">
               <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span>Active Operatives: {agents.length}</span>
+              <span>Ops: {totalOpsCount.toLocaleString()}</span>
             </div>
 
             <Link
@@ -200,13 +194,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </button>
             </div>
             <form onSubmit={handleBroadcast} className="mt-4 space-y-4">
-              <p className="text-xs text-slate-400">
-                This directive will be dispatched simultaneously to the Swarm Orchestrator (A99) and routed across all 9 division leads.
-              </p>
               <textarea
                 value={broadcastText}
                 onChange={(e) => setBroadcastText(e.target.value)}
-                placeholder="Enter strategic swarm directive (e.g., 'Execute full system vulnerability scan and compile latency benchmarks')..."
+                placeholder="Enter strategic swarm directive..."
                 className="w-full h-32 rounded-xl border border-slate-700 bg-slate-900/90 p-3 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                 required
               />

@@ -23,13 +23,6 @@ export interface AgentDivision {
   agentCount: number
 }
 
-export interface AgentCapability {
-  id: string
-  name: string
-  description: string
-  icon: string
-}
-
 export interface Agent {
   id: string
   code: string // e.g. "A1", "A42", "A99"
@@ -58,6 +51,14 @@ export interface ToolCallStep {
   status: 'running' | 'completed' | 'failed'
 }
 
+export interface CodeSandboxResult {
+  code: string
+  output: string
+  executionTimeMs: number
+  status: 'success' | 'error'
+  chartData?: { label: string; value: number }[]
+}
+
 export interface ChatMessage {
   id: string
   agentId: string
@@ -66,6 +67,7 @@ export interface ChatMessage {
   content: string
   thinking?: string
   toolCalls?: ToolCallStep[]
+  sandboxResult?: CodeSandboxResult
   timestamp: string
   tokenCount?: number
   tokensPerSec?: number
@@ -111,4 +113,86 @@ export interface ApiSettings {
   streamResponses: boolean
   enableSoundFx: boolean
   telemetrySpeedMs: number
+}
+
+// -------------------------------------------------------------
+// ADVANCED FEATURES TYPES
+// -------------------------------------------------------------
+
+// 1. War Room & Autonomous Roundtable
+export interface WarRoomMessage {
+  id: string
+  agentId: string
+  agentCode: string
+  agentName: string
+  avatarIcon: string
+  role: string
+  content: string
+  perspectiveType: 'proposal' | 'critique' | 'refinement' | 'consensus' | 'security'
+  timestamp: string
+  round: number
+}
+
+export interface WarRoomSession {
+  id: string
+  topic: string
+  objective: string
+  participantAgentIds: string[]
+  currentRound: number
+  maxRounds: number
+  status: 'idle' | 'debating' | 'synthesizing' | 'completed'
+  messages: WarRoomMessage[]
+  consensusSummary?: string
+  actionItems?: string[]
+}
+
+// 2. Visual Drag-and-Drop Workflow Builder
+export interface VisualNode {
+  id: string
+  agentId: string
+  type: 'agent' | 'condition' | 'aggregator' | 'output'
+  label: string
+  x: number
+  y: number
+  status: 'idle' | 'running' | 'completed' | 'failed'
+  outputData?: string
+}
+
+export interface VisualConnection {
+  id: string
+  fromNodeId: string
+  toNodeId: string
+  animated?: boolean
+}
+
+export interface VisualPipeline {
+  id: string
+  name: string
+  description: string
+  nodes: VisualNode[]
+  connections: VisualConnection[]
+  isRunning?: boolean
+  progress?: number
+}
+
+// 3. Document RAG Knowledge Base
+export interface KnowledgeChunk {
+  id: string
+  text: string
+  tokens: number
+  score?: number
+}
+
+export interface KnowledgeDocument {
+  id: string
+  title: string
+  fileName: string
+  fileType: string
+  sizeBytes: number
+  uploadedAt: string
+  assignedDivisionId?: AgentDivisionId | 'all'
+  assignedAgentId?: string
+  chunkCount: number
+  chunks: KnowledgeChunk[]
+  summary: string
 }

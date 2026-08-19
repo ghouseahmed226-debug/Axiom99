@@ -16,6 +16,8 @@ export default function AgentChatPage() {
   const [inputPrompt, setInputPrompt] = useState('')
   const [agentSearch, setAgentSearch] = useState('')
   const [filterDivision, setFilterDivision] = useState<string>('all')
+  const [isRecording, setIsRecording] = useState(false)
+  const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const activeAgent: Agent =
@@ -39,6 +41,80 @@ export default function AgentChatPage() {
   const handleQuickPrompt = (promptText: string) => {
     if (isGeneratingResponse) return
     sendMessage(selectedAgentId, promptText)
+  }
+
+  // Voice recognition (Speech-to-Text)
+  const handleToggleVoice = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      alert('Speech Recognition is not supported by your browser.')
+      return
+    }
+
+    if (isRecording) {
+      setIsRecording(false)
+      return
+    }
+
+    const recognition = new SpeechRecognition()
+    recognition.continuous = false
+    recognition.interimResults = false
+    recognition.lang = 'en-US'
+
+    recognition.onstart = () => setIsRecording(true)
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript
+      setInputPrompt(transcript)
+      setIsRecording(false)
+    }
+    recognition.onerror = () => setIsRecording(false)
+    recognition.onend = () => setIsRecording(false)
+
+    recognition.start()
+  }
+
+  // Text-to-Speech playback
+  const handleSpeakMessage = (msgId: string, text: string) => {
+    if (!('speechSynthesis' in window)) return
+
+    if (speakingMsgId === msgId) {
+      window.speechSynthesis.cancel()
+      setSpeakingMsgId(null)
+      return
+    }
+
+    window.speechSynthesis.cancel()
+    const cleanText = text.replace(/[*#`_]/g, '')
+    const utterance = new SpeechSynthesisUtterance(cleanText)
+    utterance.rate = 1.05
+    utterance.pitch = 0.95
+
+    utterance.onend = () => setSpeakingMsgId(null)
+    utterance.onerror = () => setSpeakingMsgId(null)
+
+    setSpeakingMsgId(msgId)
+    window.speechSynthesis.speak(utterance)
+  }
+
+  // Export chat transcript to Markdown
+  const handleExportChat = () => {
+    const md =
+      `# Chat Transcript with ${activeAgent.name} (${activeAgent.code})\n` +
+      `**Role:** ${activeAgent.role}\n` +
+      `**Date:** ${new Date().toISOString()}\n\n` +
+      activeMessages
+        .map(
+          (m) =>
+            `### ${m.senderName} (${m.timestamp})\n\n${m.content}\n`
+        )
+        .join('\n---\n\n')
+
+    const blob = new Blob([md], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `chat-${activeAgent.code}-${Date.now()}.md`
+    a.click()
   }
 
   const filteredAgents = agents.filter((a) => {
@@ -98,7 +174,6 @@ export default function AgentChatPage() {
         <div className="flex-1 overflow-y-auto divide-y divide-slate-800/40">
           {filteredAgents.map((agent) => {
             const isSelected = agent.id === selectedAgentId
-            const hasMsgs = conversations[agent.id]?.length > 0
             return (
               <button
                 key={agent.id}
@@ -168,6 +243,13 @@ export default function AgentChatPage() {
 
           <div className="flex items-center gap-2">
             <button
+              onClick={handleExportChat}
+              className="rounded-lg border border-slate-700/60 bg-slate-800/60 px-2.5 py-1 text-xs text-slate-300 hover:text-white transition"
+              title="Export Conversation Markdown"
+            >
+              📄 Export
+            </button>
+            <button
               onClick={() => clearChat(activeAgent.id)}
               className="rounded-lg border border-slate-700/60 bg-slate-800/60 px-3 py-1 text-xs text-slate-400 hover:text-white hover:bg-slate-700 transition"
               title="Clear current conversation"
@@ -209,6 +291,12 @@ export default function AgentChatPage() {
                 >
                   💻 Synthesize Code
                 </button>
+                <button
+                  onClick={() => handleQuickPrompt('Run code calculation test in JavaScript sandbox')}
+                  className="rounded-lg border border-indigo-500/40 bg-indigo-950/40 px-3 py-1 text-xs text-indigo-300 hover:border-indigo-400 transition"
+                >
+                  🧪 Code Sandbox Run
+                </button>
               </div>
             </div>
           ) : (
@@ -235,7 +323,18 @@ export default function AgentChatPage() {
                   {/* MESSAGE SENDER & TIMESTAMP */}
                   <div className="flex items-center justify-between text-[11px] font-mono opacity-80 border-b border-white/10 pb-1.5">
                     <span className="font-semibold">{msg.senderName}</span>
-                    <span>{msg.timestamp}</span>
+                    <div className="flex items-center gap-2">
+                      {msg.sender === 'agent' && (
+                        <button
+                          onClick={() => handleSpeakMessage(msg.id, msg.content)}
+                          className="hover:text-cyan-300 transition text-[11px]"
+                          title="Read aloud"
+                        >
+                          {speakingMsgId === msg.id ? '🔊 Speaking...' : '🔈 Audio'}
+                        </button>
+                      )}
+                      <span>{msg.timestamp}</span>
+                    </div>
                   </div>
 
                   {/* REASONING / THINKING STEP ACCORDION */}
@@ -271,6 +370,35 @@ export default function AgentChatPage() {
                           )}
                         </div>
                       ))}
+                    </div>
+                  )}
+
+                  {/* CODE SANDBOX RESULT CARD */}
+                  {msg.sandboxResult && (
+                    <div className="rounded-xl border border-indigo-500/40 bg-slate-950/90 p-3 space-y-2 font-mono text-xs">
+                      <div className="flex items-center justify-between text-indigo-400 text-[10px]">
+                        <span className="font-bold">🧪 SANDBOX RUNNER RESULT</span>
+                        <span className="text-emerald-400">✓ {msg.sandboxResult.executionTimeMs}ms</span>
+                      </div>
+                      <div className="bg-black/60 p-2 rounded text-emerald-300 text-[11px] whitespace-pre-wrap">
+                        {msg.sandboxResult.output}
+                      </div>
+                      {msg.sandboxResult.chartData && (
+                        <div className="space-y-1 pt-1 border-t border-slate-800">
+                          <span className="text-[10px] text-slate-400">Inline Chart Telemetry:</span>
+                          <div className="flex items-end gap-1.5 h-12 pt-2">
+                            {msg.sandboxResult.chartData.map((d, idx) => (
+                              <div key={idx} className="flex-1 flex flex-col items-center gap-0.5">
+                                <div
+                                  className="w-full rounded-t bg-cyan-500"
+                                  style={{ height: `${(d.value / 100) * 40}px` }}
+                                />
+                                <span className="text-[8px] text-slate-500">{d.label}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -331,19 +459,31 @@ export default function AgentChatPage() {
               💻 Write Code
             </button>
             <button
-              onClick={() => handleQuickPrompt('Explain your role and integration with the other 98 agents')}
+              onClick={() => handleQuickPrompt('Execute JS code sandbox calculation')}
               className="rounded-lg bg-slate-800/80 border border-slate-700/60 px-2.5 py-1 text-slate-300 hover:text-cyan-300 hover:border-cyan-500/50 whitespace-nowrap transition"
             >
-              🌐 Swarm Integration
+              🧪 Run Code Sandbox
             </button>
           </div>
 
           <form onSubmit={handleSend} className="flex gap-2 mt-1">
+            <button
+              type="button"
+              onClick={handleToggleVoice}
+              className={`rounded-xl px-3 py-2 text-sm border transition ${
+                isRecording
+                  ? 'border-rose-500 bg-rose-500/20 text-rose-400 animate-pulse'
+                  : 'border-slate-700 bg-slate-800 text-slate-400 hover:text-white'
+              }`}
+              title="Voice Speech-to-Text Input"
+            >
+              🎙️
+            </button>
             <input
               type="text"
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
-              placeholder={`Send instruction to ${activeAgent.name} (${activeAgent.code})...`}
+              placeholder={isRecording ? 'Listening... speak your prompt...' : `Send instruction to ${activeAgent.name} (${activeAgent.code})...`}
               disabled={isGeneratingResponse}
               className="flex-1 rounded-xl border border-slate-700 bg-slate-900/90 px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
             />
