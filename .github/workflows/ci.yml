@@ -1,0 +1,53 @@
+# [Agent-83: GitHub Actions Automator] -- Bulletproof CI Pipeline
+name: CI
+
+on:
+  push:
+    branches: [main, master, dev, 'feature/**']
+  pull_request:
+    branches: [main, master, dev]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: 'Web & Extension Build Check'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Workspace Dependencies
+        run: |
+          npm install --legacy-peer-deps
+      - name: Typecheck Web App
+        run: |
+          cd apps/web && npx tsc --noEmit
+      - name: Build Web App
+        run: |
+          cd apps/web && npx vite build
+      - name: Upload Web Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: apps/web/dist/
+          retention-days: 7
+
+  api:
+    name: 'Python AI & Analytics Engine'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install fastapi uvicorn pydantic slowapi pytest pytest-asyncio httpx numpy
+      - name: Run Test Suite
+        run: |
+          python -m pytest apps/api/tests -v --tb=short

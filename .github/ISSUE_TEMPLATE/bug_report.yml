@@ -1,0 +1,30 @@
+name: 'Bug Report'
+description: Report a reproducible bug in NexusWeb
+labels: ['bug', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: '## Bug Report - Thanks for your time!'
+  - type: input
+    id: summary
+    attributes:
+      label: Short Summary
+      placeholder: e.g. Physics object falls through ground on Firefox
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to Reproduce
+      placeholder: "1. Go to...\n2. Click...\n3. See error"
+    validations: { required: true }
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and Version
+      placeholder: Chrome 126 / Firefox 127 / Safari 17
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options: [Critical, High, Medium, Low]
+    validations: { required: true }

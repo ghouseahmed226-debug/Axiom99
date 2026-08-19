@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NexusWeb Console</title>
+  <style>
+    body { width: 320px; margin: 0; padding: 16px; background: #0a0a0f; color: #fff; font-family: sans-serif; }
+    h1 { font-size: 18px; color: #6c47ff; margin: 0 0 12px 0; }
+    button { width: 100%; padding: 10px; background: #6c47ff; border: none; color: #fff; font-weight: bold; cursor: pointer; border-radius: 4px; }
+    button:hover { background: #8b5cf6; }
+  </style>
+</head>
+<body>
+  <h1>🕹️ NexusWeb</h1>
+  <p style="font-size: 12px; color: #a78bfa;">Instant Browser Game Console</p>
+  <button id="launchBtn">Launch Nexus Console</button>
+  <script>
+    document.getElementById('launchBtn').addEventListener('click', () => {
+      chrome.tabs.create({ url: 'http://localhost:3000' });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "sessions": {
+      "$sessionId": {
+        ".read":  "auth != null && data.child(\"players\").hasChild(auth.uid)",
+        ".write": "auth != null && (data.child(\"players\").hasChild(auth.uid) || !data.exists())",
+        "players": {
+          "$uid": {
+            ".write":   "auth != null && auth.uid === $uid",
+            ".validate":"newData.hasChildren([\"x\",\"y\",\"z\",\"yaw\",\"seq\"]) && newData.child(\"seq\").isNumber() && newData.child(\"seq\").val() > data.child(\"seq\").val()"
+          }
+        },
+        "inputs": {
+          "$uid": {
+            ".write":   "auth != null && auth.uid === $uid",
+            ".validate":"newData.child(\"tick\").isNumber() && newData.child(\"actions\").isString()"
+          }
+        }
+      }
+    }
+  }
+}
