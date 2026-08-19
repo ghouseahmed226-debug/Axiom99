@@ -3,15 +3,18 @@
 # 🕹️ Axiom99 // NexusWeb Console
 ### *The Next-Generation Open-Source Browser-Native 3D Game Engine & Console*
 
+[![Live Demo](https://img.shields.io/badge/LIVE_DEMO-PLAY_NOW-00ffcc?style=for-the-badge&logo=googlechrome&logoColor=black)](https://ghouseahmed226-debug.github.io/Axiom99/)
 [![CI](https://github.com/ghouseahmed226-debug/Axiom99/actions/workflows/ci.yml/badge.svg)](https://github.com/ghouseahmed226-debug/Axiom99/actions/workflows/ci.yml)
-[![WebGPU Ready](https://img.shields.io/badge/WebGPU-Enabled-6c47ff?style=for-the-badge&logo=webassembly)](https://github.com/ghouseahmed226-debug/Axiom99)
+[![Pages Deploy](https://github.com/ghouseahmed226-debug/Axiom99/actions/workflows/pages.yml/badge.svg)](https://github.com/ghouseahmed226-debug/Axiom99/actions/workflows/pages.yml)
 [![Three.js](https://img.shields.io/badge/Three.js-0.165-0080ff?style=for-the-badge&logo=three.js)](https://threejs.org/)
 [![React 18](https://img.shields.io/badge/React-18-61dafb?style=for-the-badge&logo=react)](https://reactjs.org/)
-[![PWA](https://img.shields.io/badge/PWA-Installable-00c853?style=for-the-badge&logo=pwa)](https://github.com/ghouseahmed226-debug/Axiom99)
-[![Chrome Extension](https://img.shields.io/badge/Extension-MV3-ffd600?style=for-the-badge&logo=googlechrome)](https://github.com/ghouseahmed226-debug/Axiom99)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-pgvector-3ecf8e?style=for-the-badge&logo=supabase)](https://supabase.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+
+<br/>
+
+## 🌐 **[👉 CLICK HERE TO PLAY LIVE DEMO 👈](https://ghouseahmed226-debug.github.io/Axiom99/)**
+### **Live URL**: `https://ghouseahmed226-debug.github.io/Axiom99/`
 
 <p align="center">
   <b>Play instantly in any modern browser. Zero downloads. Sub-16ms latency. AI-driven gameplay.</b>
@@ -21,11 +24,13 @@
 
 ---
 
-## 🌌 Overview
+## 🎮 Playable 3D Game Cartridges
 
-**Axiom99 (NexusWeb)** is an ultra-performant, open-source, browser-based gaming console and engine. Architected to run anywhere from low-tier mobile devices to high-end WebGPU workstations, Axiom99 marries real-time spatial networking, high-performance 3D rendering, and predictive machine learning models into a unified monorepo.
-
-Developed and orchestrated through the **Swarm 99-Agent Development Studio Architecture**.
+| Cartridge | Tech & Mechanics | Controls |
+|---|---|---|
+| 🏎️ **CyberRunner 2099** | Procedural 3-lane neon highway runner, jump physics, collision detection, glowing orbs, score multiplier | `[A/D]` Switch Lanes<br>`[W / Space]` Jump |
+| 🛸 **NeonArena 3D** | Top-down cyberpunk arena shooter, enemy drone swarm AI pathfinding, laser physics, particle explosions | `[WASD]` Move Ship<br>`[Mouse + Click]` Aim & Fire |
+| 🧱 **VoxelCraft 3D** | 3D voxel sandbox builder, raycasted block placement & destruction, 6-color cyber palette selector | `[Click]` Place Block<br>`[Shift + Click]` Mine Block |
 
 ---
 
@@ -64,8 +69,6 @@ Developed and orchestrated through the **Swarm 99-Agent Development Studio Archi
 
 ## 🤖 The 99-Agent Division Roster
 
-The entire codebase is partitioned across 9 specialized squads (11 agents each):
-
 | Division | Squad Name | Mission & Key Directives | Core Agents |
 |---|---|---|---|
 | **Div 1** | **Core Engine & Graphics** | 60FPS+ WebGPU/WebGL2 rendering, LOD, draw call batching | `A1` WebGPU Architect, `A4` BufferGeometry Optimizer, `A9` WASM Jolt Physics |
@@ -80,126 +83,41 @@ The entire codebase is partitioned across 9 specialized squads (11 agents each):
 
 ---
 
-## ⚡ Key Features
-
-- **🎮 Dual Renderer Pipeline**: Adaptive WebGPU detection with automatic WebGL2 fallback.
-- **🏎️ Fixed 64Hz Physics Loop**: Rapier WASM physics simulation with accumulator substepping.
-- **🌐 Ephemeral Spatial Hose**: 42-byte bit-packed input frames synced over Firebase Realtime DB.
-- **🔒 Enterprise Security**: 100% Row-Level Security (RLS) enforcement on Supabase PostgreSQL.
-- **🧠 Predictive AI Stack**:
-  - **SBMM Engine**: XGBoost regressor clustering players within $\pm 150$ ELO bands.
-  - **Anti-Cheat Engine**: Isolation Forest anomaly scoring detecting spinbots and speedhacks.
-  - **LLM Memory Engine**: `pgvector` IVFFlat indexing for dynamic NPC quest memory.
-- **📱 PWA & Extension**: Fullscreen landscape installable PWA + Chrome Manifest V3 popup.
-
----
-
 ## 🚀 Quickstart Guide
 
-### Prerequisites
-- **Node.js**: $\ge 18.0.0$
-- **npm**: $\ge 10.0.0$
-- **Python**: $\ge 3.11$
-- **Git**
-
-### 1. Clone & Bootstrap
 ```bash
+# 1. Clone repository
 git clone https://github.com/ghouseahmed226-debug/Axiom99.git
 cd Axiom99
 
-# Run automated bootstrap
+# 2. Run instant setup
 ./setup.sh
-```
 
-### 2. Configure Environment
-```bash
-cp .env.example .env
-# Edit .env and supply your Firebase & Supabase API keys
-```
+# 3. Start Web Console (PWA)
+cd apps/web && npm run dev
+# -> http://localhost:3000
 
-### 3. Start Development Servers
-```bash
-# Terminal 1: Launch Web Console (PWA)
-cd apps/web
-npm run dev
-# Open http://localhost:3000
-
-# Terminal 2: Launch AI Engine
-cd apps/api
-uvicorn src.main:app --reload --port 8000
-# Docs at http://localhost:8000/docs
+# 4. Start Python AI Backend
+cd apps/api && uvicorn src.main:app --reload --port 8000
+# -> http://localhost:8000/docs
 ```
 
 ---
 
-## 🧪 Testing Suite
+## ☁️ Deployment
 
-```bash
-# Run Python AI & ML Unit Tests
-python -m pytest apps/api/tests -v
+### 1. GitHub Pages (Automated)
+This repository includes an automatic GitHub Actions deployment workflow (`.github/workflows/pages.yml`).  
+In your repository:
+1. Go to **Settings** → **Pages**
+2. Under **Build and deployment** → **Source**, select **GitHub Actions**.
+3. Every push to `main` automatically updates your live game console at:  
+   👉 **`https://ghouseahmed226-debug.github.io/Axiom99/`**
 
-# Run Typecheck across Monorepo
-npm run typecheck
-```
-
----
-
-## 📦 Project Structure
-
-```
-Axiom99/
-├── .github/workflows/      # Automated CI/CD (lint, test, build, deploy)
-├── apps/
-│   ├── api/                # FastAPI backend + ML models (SBMM, Anti-Cheat, Quests)
-│   ├── extension/          # Chrome MV3 Extension
-│   ├── supabase/           # Migrations, RLS policies, pgvector & seed fixtures
-│   └── web/                # React 18 + Three.js + R3F + Tailwind Web Console
-├── packages/
-│   ├── physics-wasm/       # Custom physics bindings
-│   ├── shared-types/       # Universal TypeScript interfaces
-│   └── ui-kit/             # Cyberpunk HUD components
-├── database.rules.json     # Firebase Realtime security rules
-├── setup.sh                # Instant setup script
-└── turbo.json              # Turborepo build pipeline
-```
-
----
-
-## 📡 API Reference
-
-### 1. Anti-Cheat Telemetry Verification
-`POST /v1/anticheat/verify`
-```json
-{
-  "uid": "usr_d3b07384",
-  "session_id": "session_7fa91c8e",
-  "tick": 14890,
-  "x": 142.85, "y": 12.0, "z": -482.11,
-  "velocity_magnitude": 6.84,
-  "heading_delta": 0.045,
-  "hs_ratio_session": 0.38,
-  "reaction_ms": 138.0
-}
-```
-
-### 2. Skill-Based Matchmaking Clustering
-`POST /v1/matchmaking/cluster`
-```json
-{
-  "players": [
-    { "uid": "usr_1", "features": { "kd_ratio": 2.4, "win_rate_7d": 0.65 } },
-    { "uid": "usr_2", "features": { "kd_ratio": 2.2, "win_rate_7d": 0.60 } }
-  ],
-  "lobby_size": 20
-}
-```
-
----
-
-## 🤝 Contributing
-
-We welcome contributions from game developers, 3D artists, and AI engineers!  
-Read [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+### 2. Vercel / Netlify
+- **Root Directory**: `apps/web`
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
 
 ---
 
