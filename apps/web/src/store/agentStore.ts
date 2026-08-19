@@ -13,6 +13,8 @@ import {
   VisualConnection,
   KnowledgeDocument,
   CodeSandboxResult,
+  ProjectArtifact,
+  ApiEndpointSpec,
 } from '../types/agent'
 import { AGENTS_ROSTER, AGENT_DIVISIONS } from '../data/agentsRoster'
 
@@ -241,6 +243,66 @@ const DEFAULT_DOCUMENTS: KnowledgeDocument[] = [
   },
 ]
 
+const DEFAULT_ARTIFACT: ProjectArtifact = {
+  id: 'art-1',
+  name: 'Axiom99 Edge Microservice Scaffold',
+  description: 'Synthesized high-performance TypeScript microservice scaffold with security guardrails and telemetry endpoints.',
+  authorAgentId: 'agent-88',
+  createdAt: '2026-08-19',
+  files: [
+    {
+      path: 'src/index.ts',
+      name: 'index.ts',
+      language: 'typescript',
+      content: `import { Hono } from 'hono';\nimport { logger } from 'hono/logger';\nimport { telemetryMiddleware } from './middleware/telemetry';\n\nconst app = new Hono();\napp.use('*', logger());\napp.use('*', telemetryMiddleware());\n\napp.get('/health', (c) => c.json({ status: 'HEALTHY', timestamp: Date.now() }));\n\nexport default app;`,
+      originalContent: `import { Hono } from 'hono';\n\nconst app = new Hono();\napp.get('/health', (c) => c.json({ status: 'ok' }));\n\nexport default app;`,
+      isModified: true,
+    },
+    {
+      path: 'src/middleware/telemetry.ts',
+      name: 'telemetry.ts',
+      language: 'typescript',
+      content: `import { Context, Next } from 'hono';\n\nexport const telemetryMiddleware = () => async (c: Context, next: Next) => {\n  const start = performance.now();\n  await next();\n  const duration = performance.now() - start;\n  c.header('X-Swarm-Latency-MS', duration.toFixed(2));\n};`,
+    },
+    {
+      path: 'package.json',
+      name: 'package.json',
+      language: 'json',
+      content: `{\n  "name": "axiom99-edge-service",\n  "version": "1.0.0",\n  "type": "module",\n  "dependencies": {\n    "hono": "^4.4.0"\n  }\n}`,
+    },
+  ],
+}
+
+const DEFAULT_API_ENDPOINTS: ApiEndpointSpec[] = [
+  {
+    id: 'ep-1',
+    method: 'POST',
+    path: '/api/v1/swarm/dispatch',
+    category: 'Agent Execution',
+    description: 'Dispatch an operational directive directly to any of the 99 agents with temperature controls.',
+    requestBodySample: `{\n  "agentCode": "A1",\n  "instruction": "Benchmark WebGPU compute shader latency",\n  "temperature": 0.2\n}`,
+    responseSample: `{\n  "status": "SUCCESS",\n  "agent": "WebGPU Architect (A1)",\n  "executionTimeMs": 42,\n  "tokensUsed": 180,\n  "response": "### WebGPU Compute Pipeline Benchmark\\nAll compute pipelines nominal."\n}`,
+  },
+  {
+    id: 'ep-2',
+    method: 'POST',
+    path: '/api/v1/warroom/debate',
+    category: 'Autonomous Roundtable',
+    description: 'Trigger autonomous multi-agent group deliberation and receive a ratified consensus report.',
+    requestBodySample: `{\n  "topic": "Zero-copy memory buffer protocol",\n  "participants": ["A1", "A67", "A23", "A99"],\n  "rounds": 3\n}`,
+    responseSample: `{\n  "status": "COMPLETED",\n  "consensus": "Unanimous agreement on atomic lock-free CAS primitives.",\n  "actionItems": ["Implement CAS buffer in Div 1", "Add security bounds in Div 7"]\n}`,
+  },
+  {
+    id: 'ep-3',
+    method: 'POST',
+    path: '/api/v1/workflows/run',
+    category: 'Workflows',
+    description: 'Execute automated multi-agent mission pipeline (e.g. security sweep, latency optimization).',
+    requestBodySample: `{\n  "workflowId": "wf-1",\n  "async": false\n}`,
+    responseSample: `{\n  "status": "COMPLETED",\n  "stepsCompleted": 4,\n  "totalDurationMs": 4820,\n  "artifactUrl": "https://axiom99.vercel.app/artifacts/wf-1.json"\n}`,
+  },
+]
+
 interface AgentStoreState {
   // Agents State
   agents: Agent[]
@@ -270,10 +332,23 @@ interface AgentStoreState {
   knowledgeDocuments: KnowledgeDocument[]
   knowledgeSearchQuery: string
 
+  // Autonomous Swarm Simulation
+  isSimulationActive: boolean
+  lastSimulationEvent: string
+
+  // Codebase Artifacts & ZIP Exporter
+  projectArtifact: ProjectArtifact
+
+  // API Gateway
+  apiEndpoints: ApiEndpointSpec[]
+  apiKeySimulated: string
+
   // Telemetry & Logs
   logs: SwarmTelemetryLog[]
   systemUptimeSec: number
   totalOpsCount: number
+  totalTokensEmitted: number
+  estimatedComputeCostUsd: number
 
   // Settings
   settings: ApiSettings
@@ -291,6 +366,9 @@ interface AgentStoreState {
   addTelemetryLog: (log: Omit<SwarmTelemetryLog, 'id' | 'timestamp'>) => void
   updateSettings: (partial: Partial<ApiSettings>) => void
   broadcastSwarmMessage: (content: string) => Promise<void>
+
+  // Autonomous Simulation Actions
+  toggleSimulation: () => void
 
   // War Room Actions
   startWarRoomDebate: (topic: string, objective: string, participantIds?: string[]) => Promise<void>
@@ -311,6 +389,9 @@ interface AgentStoreState {
 
   // Sandbox Runner
   executeCodeInSandbox: (code: string) => CodeSandboxResult
+
+  // Project Artifact Actions
+  updateArtifactFile: (path: string, newContent: string) => void
 }
 
 const createInitialChats = (): Record<string, ChatMessage[]> => {
@@ -328,7 +409,7 @@ const createInitialChats = (): Record<string, ChatMessage[]> => {
         `- **Active Nodes**: 99 / 99\n` +
         `- **Mean Latency**: 48ms\n` +
         `- **Swarm Consensus**: 100%\n\n` +
-        `How would you like to direct the swarm today? You can dispatch single agent queries, start a **Multi-Agent War Room**, build a **Visual Flow**, or search the **Knowledge Base**.`,
+        `Direct the swarm via single agent chat, **Multi-Agent War Room**, **Visual Flow Builder**, **Observability Analytics**, or the **REST API Gateway**.`,
       thinking: 'Verified global agent registry state and loaded division telemetry metrics.',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       tokenCount: 84,
@@ -336,35 +417,10 @@ const createInitialChats = (): Record<string, ChatMessage[]> => {
     },
   ]
 
-  initial['agent-1'] = [
-    {
-      id: 'msg-init-1',
-      agentId: 'agent-1',
-      sender: 'agent',
-      senderName: 'WebGPU Architect (A1)',
-      content:
-        `### WebGPU Systems Core Ready ⚡\n\nI specialize in low-level graphics architectures, WebGPU/WebGL2 compute pipelines, and hardware shader efficiency.\n\n` +
-        `Ask me for shader code reviews, compute buffer allocations, memory alignment strategies, or hardware tier optimizations.`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      tokenCount: 52,
-    },
-  ]
-
-  initial['agent-67'] = [
-    {
-      id: 'msg-init-67',
-      agentId: 'agent-67',
-      sender: 'agent',
-      senderName: 'Memory Shield Core (A67)',
-      content:
-        `### Security Guardrails Active 🛡️\n\nZero known vulnerabilities detected across memory boundaries. Ready to audit endpoints, validate sanitization logic, and test prompt injection defenses.`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      tokenCount: 44,
-    },
-  ]
-
   return initial
 }
+
+let simulationTimer: any = null
 
 export const useAgentStore = create<AgentStoreState>((set, get) => {
   const savedCustom = localStorage.getItem('axiom99_custom_agents')
@@ -395,6 +451,11 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
     isVisualPipelineRunning: false,
     knowledgeDocuments: initialDocs,
     knowledgeSearchQuery: '',
+    isSimulationActive: true,
+    lastSimulationEvent: 'A99 synchronized telemetry states with 9 division leads',
+    projectArtifact: DEFAULT_ARTIFACT,
+    apiEndpoints: DEFAULT_API_ENDPOINTS,
+    apiKeySimulated: 'ax99_live_sec_7894a20b8e',
     logs: [
       {
         id: 'log-1',
@@ -412,18 +473,33 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
         level: 'info',
         message: 'Hardware tier detection completed: Tier-3 Compute Shader active.',
       },
-      {
-        id: 'log-3',
-        timestamp: new Date().toLocaleTimeString(),
-        agentId: 'agent-34',
-        agentCode: 'A34',
-        level: 'info',
-        message: 'pgvector HNSW memory index loaded with 1,024 vector dimensions.',
-      },
     ],
-    systemUptimeSec: 1420,
-    totalOpsCount: 18940,
+    systemUptimeSec: 2140,
+    totalOpsCount: 24890,
+    totalTokensEmitted: 894520,
+    estimatedComputeCostUsd: 1.48,
     settings: initialSettings,
+
+    toggleSimulation: () => {
+      const active = !get().isSimulationActive
+      set({ isSimulationActive: active })
+
+      if (active) {
+        get().addTelemetryLog({
+          agentId: 'agent-99',
+          agentCode: 'A99',
+          level: 'success',
+          message: 'Autonomous Swarm Simulation Heartbeat started.',
+        })
+      } else {
+        get().addTelemetryLog({
+          agentId: 'agent-99',
+          agentCode: 'A99',
+          level: 'warn',
+          message: 'Autonomous Swarm Simulation Heartbeat paused.',
+        })
+      }
+    },
 
     selectAgent: (agentId: string) => {
       set({ selectedAgentId: agentId })
@@ -464,13 +540,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
         selectedAgentId: createdAgent.id,
       })
 
-      get().addTelemetryLog({
-        agentId: createdAgent.id,
-        agentCode: createdAgent.code,
-        level: 'success',
-        message: `Custom agent [${createdAgent.name}] deployed to swarm with model ${createdAgent.model}.`,
-      })
-
       return createdAgent
     },
 
@@ -492,7 +561,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
       const state = get()
       const targetAgent = state.agents.find((a) => a.id === agentId) || state.agents[0]
 
-      // Check for code sandbox execution if user asks to run JS code
       let sandboxResult: CodeSandboxResult | undefined = undefined
       if (userText.toLowerCase().includes('run code') || userText.toLowerCase().includes('execute js') || userText.toLowerCase().includes('calculate')) {
         const sampleCode = `const metrics = [12, 19, 3, 5, 2, 3];\nconst sum = metrics.reduce((a, b) => a + b, 0);\nconst avg = (sum / metrics.length).toFixed(2);\nreturn { sum, avg, count: metrics.length };`
@@ -520,13 +588,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
         totalOpsCount: s.totalOpsCount + 1,
       }))
 
-      get().addTelemetryLog({
-        agentId: targetAgent.id,
-        agentCode: targetAgent.code,
-        level: 'exec',
-        message: `Inbound instruction received for [${targetAgent.name}]: "${userText.slice(0, 45)}..."`,
-      })
-
       const startTime = Date.now()
       await new Promise((res) => setTimeout(res, 600 + Math.random() * 800))
 
@@ -534,7 +595,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
       let thinkingText = `Analyzing input parameters from Commander. Cross-referencing division directives for [${targetAgent.role}]. Synthesizing optimal actionable recommendations.`
       const toolSteps = []
 
-      // RAG Retrieval check
       const matchedChunks = get().searchKnowledgeBase(userText)
       if (matchedChunks.length > 0) {
         thinkingText += ` Ingested ${matchedChunks.length} relevant context chunks from Knowledge Base RAG memory.`
@@ -578,7 +638,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
           `export async function executeDirective(params: Record<string, unknown>) {\n` +
           `  const telemetry = performance.now()\n` +
           `  try {\n` +
-          `    // Autonomous pipeline execution\n` +
           `    const result = await processSwarmTask('${targetAgent.code}', params)\n` +
           `    return { status: 'SUCCESS', latencyMs: performance.now() - telemetry, result }\n` +
           `  } catch (err) {\n` +
@@ -595,8 +654,7 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
           `**Operational Breakdown:**\n` +
           `1. **Domain Alignment**: Handled under **${targetAgent.role}** guidelines.\n` +
           `2. **Action Item**: Executing target subroutines with temperature parameter \`${targetAgent.temperature}\`.\n` +
-          `3. **Outcome**: Synthesized plan delivered with full backward compatibility.\n\n` +
-          `Let me know if you want to drill down further into any specific sub-tasks or escalate to another division.`
+          `3. **Outcome**: Synthesized plan delivered with full backward compatibility.`
       }
 
       const elapsed = (Date.now() - startTime) / 1000
@@ -622,14 +680,9 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
           [agentId]: [...(s.conversations[agentId] || []), agentReply],
         },
         isGeneratingResponse: false,
+        totalTokensEmitted: s.totalTokensEmitted + tokenCount,
+        estimatedComputeCostUsd: Number((s.estimatedComputeCostUsd + (tokenCount * 0.000002)).toFixed(4)),
       }))
-
-      get().addTelemetryLog({
-        agentId: targetAgent.id,
-        agentCode: targetAgent.code,
-        level: 'success',
-        message: `Response generated by [${targetAgent.code}] (${tokenCount} tokens, ${Math.round(tokenCount / Math.max(0.5, elapsed))} tok/s).`,
-      })
     },
 
     clearChat: (agentId: string) => {
@@ -659,13 +712,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
         ),
       }))
 
-      get().addTelemetryLog({
-        agentId: 'agent-99',
-        agentCode: 'A99',
-        level: 'info',
-        message: `Workflow started: "${wf.name}" (${wf.steps.length} sequential steps).`,
-      })
-
       for (let i = 0; i < wf.steps.length; i++) {
         const step = wf.steps[i]
         const stepAgent = get().agents.find((a) => a.id === step.agentId) || get().agents[0]
@@ -683,13 +729,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
               : w
           ),
         }))
-
-        get().addTelemetryLog({
-          agentId: stepAgent.id,
-          agentCode: stepAgent.code,
-          level: 'exec',
-          message: `Executing step [${i + 1}/${wf.steps.length}]: "${step.title}" via [${stepAgent.code}]`,
-        })
 
         const stepTime = 1200 + Math.random() * 800
         await new Promise((res) => setTimeout(res, stepTime))
@@ -716,13 +755,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
               : w
           ),
         }))
-
-        get().addTelemetryLog({
-          agentId: stepAgent.id,
-          agentCode: stepAgent.code,
-          level: 'success',
-          message: `Step [${i + 1}/${wf.steps.length}] verified by [${stepAgent.name}].`,
-        })
       }
 
       set((s) => ({
@@ -731,13 +763,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
           w.id === workflowId ? { ...w, status: 'completed', progress: 100 } : w
         ),
       }))
-
-      get().addTelemetryLog({
-        agentId: 'agent-99',
-        agentCode: 'A99',
-        level: 'success',
-        message: `Workflow "${wf.name}" completed with 100% consensus.`,
-      })
     },
 
     resetWorkflow: (workflowId: string) => {
@@ -785,9 +810,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
       await state.sendMessage('agent-99', `[BROADCAST INSTRUCTION]: ${content}`)
     },
 
-    // -------------------------------------------------------------
-    // WAR ROOM DEBATE ENGINE
-    // -------------------------------------------------------------
     startWarRoomDebate: async (topic: string, objective: string, participantIds) => {
       const state = get()
       const participants = participantIds || state.warRoom.participantAgentIds
@@ -806,14 +828,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
         },
       }))
 
-      get().addTelemetryLog({
-        agentId: 'agent-99',
-        agentCode: 'A99',
-        level: 'info',
-        message: `War Room debate convened: "${topic}" with ${participants.length} delegates.`,
-      })
-
-      // Run 3 autonomous rounds of debate
       const debateSequence = [
         {
           agentId: participants[0] || 'agent-1',
@@ -870,7 +884,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
         }))
       }
 
-      // Final consensus report
       const consensusSummary =
         `### Official War Room Consensus Resolution 👑\n\n` +
         `**Objective:** ${objective}\n\n` +
@@ -895,13 +908,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
           ],
         },
       }))
-
-      get().addTelemetryLog({
-        agentId: 'agent-99',
-        agentCode: 'A99',
-        level: 'success',
-        message: `War Room concluded. Unanimous consensus established for "${topic}".`,
-      })
     },
 
     resetWarRoom: () => {
@@ -911,9 +917,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
       })
     },
 
-    // -------------------------------------------------------------
-    // VISUAL WORKFLOW PIPELINE ACTIONS
-    // -------------------------------------------------------------
     addVisualNode: (agentId: string, type: VisualNode['type'] = 'agent') => {
       const state = get()
       const agent = state.agents.find((a) => a.id === agentId) || state.agents[0]
@@ -982,19 +985,9 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
 
       set({ isVisualPipelineRunning: true })
 
-      get().addTelemetryLog({
-        agentId: 'agent-99',
-        agentCode: 'A99',
-        level: 'info',
-        message: `Visual Node Pipeline "${state.visualPipeline.name}" execution started.`,
-      })
-
       const nodes = state.visualPipeline.nodes
 
       for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i]
-
-        // Mark node as running
         set((s) => ({
           visualPipeline: {
             ...s.visualPipeline,
@@ -1007,7 +1000,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
 
         await new Promise((res) => setTimeout(res, 900))
 
-        // Mark node as completed
         set((s) => ({
           visualPipeline: {
             ...s.visualPipeline,
@@ -1032,13 +1024,6 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
           progress: 100,
         },
       }))
-
-      get().addTelemetryLog({
-        agentId: 'agent-99',
-        agentCode: 'A99',
-        level: 'success',
-        message: `Visual Pipeline executed 100% successfully across ${nodes.length} nodes.`,
-      })
     },
 
     resetVisualPipeline: () => {
@@ -1052,12 +1037,8 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
       }))
     },
 
-    // -------------------------------------------------------------
-    // KNOWLEDGE BASE & RAG ACTIONS
-    // -------------------------------------------------------------
     addKnowledgeDocument: (docData, rawText) => {
       const state = get()
-      // Generate chunks
       const paragraphs = rawText.split('\n\n').filter(Boolean)
       const chunks = paragraphs.map((p, i) => ({
         id: `chunk-${Date.now()}-${i}`,
@@ -1075,15 +1056,7 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
 
       const updatedDocs = [...state.knowledgeDocuments, newDoc]
       localStorage.setItem('axiom99_docs', JSON.stringify(updatedDocs))
-
       set({ knowledgeDocuments: updatedDocs })
-
-      get().addTelemetryLog({
-        agentId: 'agent-34',
-        agentCode: 'A34',
-        level: 'success',
-        message: `Knowledge Document "${newDoc.title}" indexed into pgvector memory with ${chunks.length} chunks.`,
-      })
     },
 
     deleteKnowledgeDocument: (docId: string) => {
@@ -1115,13 +1088,9 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
       return matches.sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 3)
     },
 
-    // -------------------------------------------------------------
-    // IN-BROWSER CODE SANDBOX
-    // -------------------------------------------------------------
     executeCodeInSandbox: (code: string) => {
       const start = performance.now()
       try {
-        // Safe JavaScript evaluation using Function constructor
         const func = new Function(code)
         const output = func()
         const duration = Math.round(performance.now() - start)
@@ -1148,6 +1117,17 @@ export const useAgentStore = create<AgentStoreState>((set, get) => {
           status: 'error',
         }
       }
+    },
+
+    updateArtifactFile: (path: string, newContent: string) => {
+      set((s) => ({
+        projectArtifact: {
+          ...s.projectArtifact,
+          files: s.projectArtifact.files.map((f) =>
+            f.path === path ? { ...f, content: newContent, isModified: true } : f
+          ),
+        },
+      }))
     },
   }
 })

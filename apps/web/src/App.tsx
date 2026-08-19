@@ -8,6 +8,9 @@ const AgentChatPage = lazy(() => import('./features/chat/AgentChatPage'))
 const WarRoomPage = lazy(() => import('./features/warroom/WarRoomPage'))
 const NeuralMeshPage = lazy(() => import('./features/neural/NeuralMeshPage'))
 const WorkflowBuilderPage = lazy(() => import('./features/builder/WorkflowBuilderPage'))
+const SwarmAnalyticsPage = lazy(() => import('./features/analytics/SwarmAnalyticsPage'))
+const CodebaseArtifactsPage = lazy(() => import('./features/artifacts/CodebaseArtifactsPage'))
+const ApiGatewayPage = lazy(() => import('./features/gateway/ApiGatewayPage'))
 const SwarmWorkflowsPage = lazy(() => import('./features/workflows/SwarmWorkflowsPage'))
 const AgentRosterPage = lazy(() => import('./features/roster/AgentRosterPage'))
 const KnowledgeBasePage = lazy(() => import('./features/knowledge/KnowledgeBasePage'))
@@ -25,6 +28,9 @@ export default function App() {
             <Route path="/war-room" element={<WarRoomPage />} />
             <Route path="/neural-mesh" element={<NeuralMeshPage />} />
             <Route path="/builder" element={<WorkflowBuilderPage />} />
+            <Route path="/analytics" element={<SwarmAnalyticsPage />} />
+            <Route path="/artifacts" element={<CodebaseArtifactsPage />} />
+            <Route path="/api-gateway" element={<ApiGatewayPage />} />
             <Route path="/workflows" element={<SwarmWorkflowsPage />} />
             <Route path="/roster" element={<AgentRosterPage />} />
             <Route path="/knowledge" element={<KnowledgeBasePage />} />

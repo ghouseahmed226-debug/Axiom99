@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAgentStore } from '../../store/agentStore'
+import { testApiConnection } from '../../lib/llmClient'
 
 export default function SettingsPage() {
   const { settings, updateSettings } = useAgentStore()
@@ -12,6 +13,7 @@ export default function SettingsPage() {
   const [streamResponses, setStreamResponses] = useState(settings.streamResponses)
   const [enableSoundFx, setEnableSoundFx] = useState(settings.enableSoundFx)
   const [savedNotice, setSavedNotice] = useState(false)
+  const [testStatus, setTestStatus] = useState<Record<string, string>>({})
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,6 +28,16 @@ export default function SettingsPage() {
     })
     setSavedNotice(true)
     setTimeout(() => setSavedNotice(false), 3000)
+  }
+
+  const handleTestKey = async (provider: 'gemini' | 'openai' | 'anthropic') => {
+    setTestStatus((s) => ({ ...s, [provider]: 'Testing...' }))
+    const key = provider === 'gemini' ? geminiApiKey : provider === 'openai' ? openaiApiKey : anthropicApiKey
+    const res = await testApiConnection(provider, key)
+    setTestStatus((s) => ({
+      ...s,
+      [provider]: res.success ? `✓ ${res.message} (${res.latencyMs}ms)` : `✕ ${res.message}`,
+    }))
   }
 
   return (
@@ -54,15 +66,22 @@ export default function SettingsPage() {
         {/* API PROVIDERS */}
         <div className="rounded-2xl border border-slate-800 bg-[#0d121f] p-6 space-y-4">
           <h3 className="text-sm font-bold font-mono text-white tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
-            <span className="text-cyan-400">🔑</span> LLM PROVIDER API KEYS
+            <span className="text-cyan-400">🔑</span> LLM PROVIDER API KEYS & STREAMING
           </h3>
 
           <div className="space-y-4">
+            {/* GEMINI */}
             <div className="space-y-1">
-              <label className="text-xs font-mono text-slate-300 flex justify-between">
+              <div className="flex justify-between text-xs font-mono text-slate-300">
                 <span>Google Gemini API Key</span>
-                <span className="text-slate-500 text-[10px]">Gemini 1.5 Pro / Flash</span>
-              </label>
+                <button
+                  type="button"
+                  onClick={() => handleTestKey('gemini')}
+                  className="text-cyan-400 hover:underline text-[11px]"
+                >
+                  {testStatus['gemini'] || 'Test Connection'}
+                </button>
+              </div>
               <input
                 type="password"
                 value={geminiApiKey}
@@ -72,11 +91,18 @@ export default function SettingsPage() {
               />
             </div>
 
+            {/* OPENAI */}
             <div className="space-y-1">
-              <label className="text-xs font-mono text-slate-300 flex justify-between">
+              <div className="flex justify-between text-xs font-mono text-slate-300">
                 <span>OpenAI API Key</span>
-                <span className="text-slate-500 text-[10px]">GPT-4o / GPT-4o-mini</span>
-              </label>
+                <button
+                  type="button"
+                  onClick={() => handleTestKey('openai')}
+                  className="text-cyan-400 hover:underline text-[11px]"
+                >
+                  {testStatus['openai'] || 'Test Connection'}
+                </button>
+              </div>
               <input
                 type="password"
                 value={openaiApiKey}
@@ -86,11 +112,18 @@ export default function SettingsPage() {
               />
             </div>
 
+            {/* ANTHROPIC */}
             <div className="space-y-1">
-              <label className="text-xs font-mono text-slate-300 flex justify-between">
+              <div className="flex justify-between text-xs font-mono text-slate-300">
                 <span>Anthropic API Key</span>
-                <span className="text-slate-500 text-[10px]">Claude 3.5 Sonnet</span>
-              </label>
+                <button
+                  type="button"
+                  onClick={() => handleTestKey('anthropic')}
+                  className="text-cyan-400 hover:underline text-[11px]"
+                >
+                  {testStatus['anthropic'] || 'Test Connection'}
+                </button>
+              </div>
               <input
                 type="password"
                 value={anthropicApiKey}
@@ -100,6 +133,7 @@ export default function SettingsPage() {
               />
             </div>
 
+            {/* LOCAL OLLAMA */}
             <div className="space-y-1">
               <label className="text-xs font-mono text-slate-300 flex justify-between">
                 <span>Local / Custom Endpoint (Ollama / vLLM)</span>
@@ -140,7 +174,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800">
               <div>
                 <div className="text-xs font-semibold text-slate-200">Stream Token Responses</div>
-                <div className="text-[11px] text-slate-500">Live token emission simulation</div>
+                <div className="text-[11px] text-slate-500">Live token emission streaming</div>
               </div>
               <input
                 type="checkbox"

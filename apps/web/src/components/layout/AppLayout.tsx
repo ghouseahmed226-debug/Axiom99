@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAgentStore } from '../../store/agentStore'
 
@@ -8,12 +8,34 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation()
-  const { agents, totalOpsCount } = useAgentStore()
+  const { agents, totalOpsCount, isSimulationActive, toggleSimulation, lastSimulationEvent, addTelemetryLog } =
+    useAgentStore()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [broadcastOpen, setBroadcastOpen] = useState(false)
   const [broadcastText, setBroadcastText] = useState('')
 
   const activeAgentsCount = agents.filter((a) => a.status === 'active').length
+
+  // Autonomous Swarm Simulation Ticker Loop
+  useEffect(() => {
+    if (!isSimulationActive) return
+
+    const events = [
+      'A67 (Memory Shield) audited WASM buffer integrity: 100% nominal',
+      'A1 (WebGPU Architect) balanced compute shader load across Tier-3 pipeline',
+      'A23 (WebSocket Lead) optimized Protobuf delta compression: 8.2ms latency',
+      'A49 (Anomaly Shield) scanned event stream: Zero exploit heuristics detected',
+      'A88 (Actions Automator) scheduled automated edge deployment matrix',
+      'A34 (pgvector Lead) reindexed 1,024-dim semantic memory vectors',
+    ]
+
+    const interval = setInterval(() => {
+      const picked = events[Math.floor(Math.random() * events.length)]
+      useAgentStore.setState({ lastSimulationEvent: picked })
+    }, 4500)
+
+    return () => clearInterval(interval)
+  }, [isSimulationActive])
 
   const navItems = [
     { path: '/', label: 'Swarm Command', icon: '⚡' },
@@ -21,6 +43,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { path: '/war-room', label: 'War Room Debate', icon: '⚔️' },
     { path: '/neural-mesh', label: '3D Neural Mesh', icon: '🌐' },
     { path: '/builder', label: 'Flow Builder', icon: '🧩' },
+    { path: '/analytics', label: 'Observability & Costs', icon: '📊' },
+    { path: '/artifacts', label: 'Code Artifacts', icon: '📁' },
+    { path: '/api-gateway', label: 'REST API Gateway', icon: '🔗' },
     { path: '/workflows', label: 'Workflows', icon: '🔄' },
     { path: '/roster', label: '99-Agent Roster', icon: '👥' },
     { path: '/knowledge', label: 'Knowledge RAG', icon: '🧠' },
@@ -145,6 +170,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
               {location.pathname === '/war-room' && 'Autonomous Multi-Agent War Room'}
               {location.pathname === '/neural-mesh' && '3D Swarm Neural Constellation'}
               {location.pathname === '/builder' && 'Visual Node Flowchart Builder'}
+              {location.pathname === '/analytics' && 'Swarm Telemetry & Cost Observability'}
+              {location.pathname === '/artifacts' && 'Codebase Artifacts & Diff Explorer'}
+              {location.pathname === '/api-gateway' && 'External REST API & Webhooks'}
               {location.pathname === '/workflows' && 'Automated Multi-Agent Pipelines'}
               {location.pathname === '/roster' && '99-Agent Swarm Registry & Divisions'}
               {location.pathname === '/knowledge' && 'Agent Memory & Document RAG'}
@@ -154,8 +182,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* AUTONOMOUS SIMULATION TICKER */}
+            <div className="hidden lg:flex items-center gap-2 rounded-lg bg-slate-900/80 border border-slate-800 px-3 py-1 text-[11px] font-mono text-cyan-300 max-w-sm truncate">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+              <span className="truncate">{lastSimulationEvent}</span>
+            </div>
+
             <div className="hidden md:flex items-center gap-2 rounded-lg bg-slate-800/60 border border-slate-700/50 px-3 py-1.5 text-xs font-mono text-slate-300">
-              <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse"></span>
               <span>Ops: {totalOpsCount.toLocaleString()}</span>
             </div>
 

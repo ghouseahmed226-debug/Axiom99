@@ -115,10 +115,6 @@ export interface ApiSettings {
   telemetrySpeedMs: number
 }
 
-// -------------------------------------------------------------
-// ADVANCED FEATURES TYPES
-// -------------------------------------------------------------
-
 // 1. War Room & Autonomous Roundtable
 export interface WarRoomMessage {
   id: string
@@ -195,4 +191,34 @@ export interface KnowledgeDocument {
   chunkCount: number
   chunks: KnowledgeChunk[]
   summary: string
+}
+
+// 4. Codebase Artifacts & Multi-File Project Exporter
+export interface ProjectArtifactFile {
+  path: string
+  name: string
+  language: string
+  content: string
+  originalContent?: string
+  isModified?: boolean
+}
+
+export interface ProjectArtifact {
+  id: string
+  name: string
+  description: string
+  authorAgentId: string
+  createdAt: string
+  files: ProjectArtifactFile[]
+}
+
+// 5. REST API Gateway Spec
+export interface ApiEndpointSpec {
+  id: string
+  method: 'POST' | 'GET'
+  path: string
+  description: string
+  category: string
+  requestBodySample: string
+  responseSample: string
 }
