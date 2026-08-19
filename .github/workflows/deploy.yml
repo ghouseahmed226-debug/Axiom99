@@ -1,4 +1,4 @@
-# [Agent-88: Cloudflare Edge Manager] -- Automated Deployment
+# [Agent-88: Cloudflare Edge Manager] -- Production Deployment Pipeline
 name: Deploy
 
 on:
@@ -14,11 +14,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install Dependencies
-        run: npm install --legacy-peer-deps
-      - name: Build Application
-        run: cd apps/web && npx vite build
-      - name: Archive Production Assets
+          cache: 'npm'
+          cache-dependency-path: 'apps/web/package.json'
+      - name: Install Web Dependencies
+        working-directory: apps/web
+        run: |
+          npm install --legacy-peer-deps --prefer-offline --no-audit --no-fund
+      - name: Build Web Application
+        working-directory: apps/web
+        run: |
+          npx vite build
+      - name: Archive Production Package
         uses: actions/upload-artifact@v4
         with:
           name: nexusweb-production-bundle

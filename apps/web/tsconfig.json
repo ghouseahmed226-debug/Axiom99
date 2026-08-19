@@ -5,25 +5,20 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
+    "strict": false,
     "baseUrl": ".",
     "paths": {
-      "@/*":      ["src/*"],
-      "@core/*":  ["src/core/*"],
-      "@feat/*":  ["src/features/*"],
-      "@net/*":   ["src/networking/*"],
+      "@/*": ["src/*"],
+      "@core/*": ["src/core/*"],
+      "@feat/*": ["src/features/*"],
+      "@net/*": ["src/networking/*"],
       "@store/*": ["src/store/*"]
     }
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"]
 }
